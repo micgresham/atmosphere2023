@@ -1,0 +1,274 @@
+--- 
+- name: Create holder vars
+  set_fact:
+    brand_new: []
+    new_version: []
+    new_templates: []
+    cx_template_list: []
+    first: False
+
+- name: Check to see if this is first run
+  stat: 
+    path: "{{ playbook_dir }}/template_data.yml"
+  register: firstrun
+
+- name: Set variable if this is a first run 
+  set_fact: 
+    first: True
+  when: firstrun.stat.exists == False
+
+- name: debug 
+  debug:
+    var: first
+
+- name: create hash history files on first run
+  file:
+    path: "{{playbook_dir}}/{{item}}"
+    state: touch
+  loop:
+    - 'hash_history_cx_switches.yml'
+    - 'hash_history_iap.yml'
+  when: first
+
+- name: create directories on first run
+  file:
+    path: "{{playbook_dir}}/{{item}}"
+    state: directory
+  loop:
+    - 'iap'
+    - 'cx_switches'
+    - 'meta'
+    - 'iap/archive'
+    - 'cx_switches/archive'
+    - 'meta/old_template_data_files'
+  when: first
+
+- name: Set Main Path for Files if Not Test Mode 
+  set_fact: 
+    main_path: "{{ playbook_dir }}"
+  when: testmode is not defined
+
+- name: Set Main Path for Files if Test Mode 
+  set_fact: 
+    main_path: "{{playbook_dir}}/test_mode"
+  when: testmode is defined
+
+- name: Delete Any Existing Test Mode Directory when in Test Mode 
+  file: 
+    path: "{{ main_path }}"
+    state: absent
+  when: testmode is defined
+
+- name: Create Test Mode Directory when in Test Mode 
+  file: 
+    path: "{{ main_path }}"
+    state: directory
+  when: testmode is defined
+
+- name: Copy over what is needed for testing when in Test Mode
+  synchronize:
+    src: "{{item}}"
+    dest: "{{main_path}}"
+  loop: 
+    - "cx_switches"
+    - "iap"
+    - "new_templates"
+    - "meta"
+    - "hash_history_cx_switches.yml"  
+    - "hash_history_iap.yml"
+  when: testmode is defined
+
+- name: Copy over additional files when not first run
+  synchronize:
+    src: "{{item}}"
+    dest: "{{main_path}}"
+  loop: 
+    - "template_data.yml" 
+  when: testmode is defined and not first
+
+- name: Find new templates being created
+  find:
+    paths: "{{ main_path }}/new_templates"
+    patterns: '*.txt'
+  register: new_files
+
+- name: debug to see if there are new files
+  debug:
+    var: new_files
+
+- name: Fail if there are no new templates
+  fail: 
+    msg: "There are no modified templates - template required in new_templates"
+  when: new_files.files == []
+
+- name: Find new template names
+  vars:
+    template_path: "{{item.path}}"
+    file_name: "{{template_path.split('/')[-1]}}"
+    template_name: "{{file_name.split('.')[0]}}"
+  set_fact: 
+    new_templates: "{{(new_templates+[template_name])|flatten}}" 
+  loop: "{{ new_files.files }}"
+
+- name: debug new templates
+  debug:
+    var: new_templates
+
+- name: Check to make sure correct script was run
+  fail:
+    msg: "Verify correct script was run - cannot find IAP template"
+  when: (type == 'iap' and 'iap' not in item)
+  loop: "{{new_templates}}"
+
+- name: Check to make sure correct script was run
+  fail:
+    msg: "Verify correct script was run - cannot find CX template"
+  when: (type == 'cx_switches' and ('cx' not in item))
+  loop: "{{new_templates}}"
+
+- name: Pull in template definitions
+  include_vars:
+    name: definitions
+    file: "{{ main_path }}/template_data.yml"
+  when: not first
+
+- name: Check if template being added already exists
+  set_fact:
+    brand_new: "{{ brand_new + [item] if item not in definitions.template_list else brand_new }}"
+    new_version: "{{ new_version + [item] if item in definitions.template_list else new_version }}"
+  loop: "{{ new_templates }}"
+  when: not first
+
+- name: If first run it's brand new for sure
+  set_fact:
+    brand_new: "{{ brand_new + [item] }}"
+    definitions: {template_list}
+  loop: "{{ new_templates }}"
+  when: first
+  
+- name: Ensure archive folder exists
+  vars:
+    archive_path: "{{ main_path }}/{{ definitions['template_list'][item]['folder'] }}/archive/{{ item }}"
+  file:
+    path: "{{archive_path}}"
+    state: directory
+  when: new_version != []
+  loop: "{{ new_version }}"  
+
+- name: Move existing template to archive
+  vars:
+    old_path: "{{ main_path }}/{{ definitions['template_list'][item]['folder'] }}/{{ item }}.txt"
+    new_path: "{{ main_path }}/{{ definitions['template_list'][item]['folder'] }}/archive/{{ item }}/{{ item }}-v-{{ definitions['template_list'][item]['current_version'] }}.txt"
+  command: mv {{ old_path }} {{ new_path }}
+  when: new_version != []
+  loop: "{{ new_version }}"
+
+- name: Update existing template version in template_data
+  vars: 
+    old_version: "{{ definitions['template_list'][item]['current_version'] }}"
+  set_fact:
+    definitions: "{{ definitions|combine({'template_list': {item: {'current_version': old_version|int + 1 }}}, recursive=True) }}"
+  when: new_version != []
+  loop: "{{ new_version }}"  
+
+- name: Add new template to template definitions
+  vars: 
+    current_version: "1"
+    name: "{{ item }}"
+    folder: "{{ type }}"
+  set_fact:
+    definitions: "{{ definitions|combine({'template_list': {name: {'current_version': current_version, 'folder': type,
+                   'name': name }}}, recursive=True) }}"
+  when: brand_new != []
+  loop: "{{ brand_new }}"  
+
+- name: Enforce correct version number in template
+  replace:
+    path: "{{ main_path }}/new_templates/{{ item }}.txt"
+    replace: "! TEMPLATE NAME: {{ item }} -- VERSION: {{ definitions['template_list'][item]['current_version'] }} -- {{ config_branch }}"
+    regexp: "^! TEMPLATE NAME:.*"
+  loop: "{{ new_templates }}"
+
+- name: Move new templates to active template folder
+  vars:
+    old_path: "{{ main_path }}/new_templates/{{ item }}.txt"
+    new_path: "{{ main_path}}/{{ definitions['template_list'][item]['folder'] }}/{{ item }}.txt"
+  command: mv {{ old_path }} {{ new_path }}
+  loop: "{{ new_templates }}"
+
+- name: Get md5 checksums
+  stat:
+    path: "{{ main_path }}/{{ template.value.folder }}/{{ template.value.name }}.txt"
+    get_checksum: yes
+    checksum_algorithm: md5
+  register: md5sums
+  loop: "{{ definitions.template_list|dict2items }}" 
+  loop_control:
+    loop_var: template 
+
+- name: Set md5checksums
+  vars:
+    template_name: "{{ item.template.key }}"
+    md5sum: "{{ item.stat.checksum }}"
+  set_fact: 
+      definitions: "{{ definitions|combine({'template_list': {template_name: {'hash': md5sum }}}, recursive=True ) }}"
+  loop: "{{ md5sums.results }}" 
+
+- name: Get a list of CX switch templates
+  vars:
+    folder: "{{template.value.folder }}"
+    template_name: "{{ template.key }}"
+  set_fact:
+    cx_template_list: "{{ cx_template_list + [template_name] if folder == 'cx_switches' else cx_template_list }}"
+  loop: "{{ definitions.template_list|dict2items }}"
+  loop_control:
+    loop_var: template   
+
+- name: Write checksum to hash history file - brand new
+  lineinfile:
+    path: "{{ main_path }}/hash_history_{{type}}.yml"
+    insertafter: EOF
+    line: "{{item}}:"
+  loop: "{{brand_new}}"
+  when: brand_new != []
+
+- name: Add new template type to hash history file
+  lineinfile:
+    path: "{{ main_path }}/hash_history_{{type}}.yml"
+    insertafter: "{{item}}:"
+    line: "   {{item}}_{{config_branch}}_v1: {{definitions['template_list'][item]['hash']}}"
+  loop: "{{brand_new}}"
+  when: brand_new != []
+
+- name: Add checksum to hash history file - Existing templates
+  lineinfile:
+    path: "{{ main_path }}/hash_history_{{type}}.yml"
+    insertafter: "{{item}}:"
+    line: "   {{item}}_{{config_branch}}_v{{definitions['template_list'][item]['current_version']}}: {{definitions['template_list'][item]['hash']}}"
+  loop: "{{new_version}}"
+  when: new_version != []
+
+- name: Get time stamp
+  shell: "date +%Y-%m-%d%H-%M-%S.%5N"
+  register: tstamp
+
+- name: Generate new template_data file
+  template:
+    src: "new_vars.j2"
+    dest: "{{ main_path}}/template_data.yml"
+    backup: yes
+  register: results
+
+- name: review results for any changes
+  vars:
+    changed: "{{ results.changed }}"
+    backup: "{{ results.backup_file if 'backup_file' in results else 'none' }}"
+  set_fact:
+    old_file_name: "{{ backup if changed == true else '' }}"    
+
+- name: move old template_data file if new version created
+  vars:
+    old_path: "{{ old_file_name }}"
+    new_path: "{{ main_path }}/meta/old_template_data_files/template_data-{{tstamp.stdout[10:]}}.txt"
+  command: mv {{ old_path }} {{ new_path }}
+  when: old_file_name != '' and not first

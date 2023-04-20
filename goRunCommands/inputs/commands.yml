@@ -1,0 +1,8 @@
+router:
+  - no page
+  - show bgp ipv4 unicast summary
+portinfo:
+  - no page
+  - show interface brief
+  - sleep
+  - exit

@@ -1,0 +1,23 @@
+---
+- name: Get Template Data
+  vars:
+     code_version: "ALL"
+     group_name: "{{group_to_check.value.first_group}}"
+  uri:
+    url: "{{base_url}}/configuration/v1/groups/{{group_name}}/templates?limit=20&offset=0&version={{code_version}}"
+    method: GET
+    status_code: 200
+    headers:
+       Authorization: "bearer {{api_token}}"
+       Content_Type: application/json
+  register: temp_data
+
+- name: set_fact 
+  set_fact: 
+    actual_hash: "{{temp_data['json']['data'][0]['template_hash']}}"
+
+- name: Quit if hashes don't match
+  assert:
+    that:
+       - actual_hash == group_to_check.value.expected_hash
+    msg: "Actual Hashes Do Not Match Expected!"

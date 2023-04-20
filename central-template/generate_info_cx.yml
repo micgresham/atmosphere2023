@@ -1,0 +1,9 @@
+---
+- name: Generate New Versions
+  vars:
+    config_branch: 'MAIN_BRANCH'
+    type: 'cx_switches'
+  gather_facts: no
+  hosts: localhost
+  roles:
+    - role: make_new_ver

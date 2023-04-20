@@ -1,0 +1,7 @@
+# template data
+template_list:
+    6300_cx_us_access:
+        current_version: '1'
+        folder: cx_switches
+        hash: bbf0eb2d9eb468cb95757f32b1642516
+        name: 6300_cx_us_access

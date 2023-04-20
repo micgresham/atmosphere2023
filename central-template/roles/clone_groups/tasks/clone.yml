@@ -1,0 +1,19 @@
+- name: debug group name
+  debug:
+    var: group_to_check
+
+- name: Clone
+  vars:
+     name_of_group: "{{item}}"
+     clone_group: "{{group_to_check.value.first_group}}"
+  uri:
+    url: "{{base_url}}/configuration/v2/groups/clone"
+    method: POST
+    status_code: 201
+    headers:
+       Authorization: "bearer {{api_token}}"
+       Content_Type: application/json
+    body_format: json
+    body: "{ \"group\": \"{{name_of_group}}\",\"clone_group\": \"{{clone_group}}\", \"upgrade_architecture\": false} "
+  when: group_to_check.value.clone_list != []
+  loop: "{{group_to_check.value.clone_list}}"

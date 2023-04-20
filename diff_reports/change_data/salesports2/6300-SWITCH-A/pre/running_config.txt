@@ -1,0 +1,398 @@
+2023-03-16 20:23:27 UTC
+!
+!Version ArubaOS-CX FL.10.10.1020
+!export-password: default
+hostname 6300-SWITCH-A
+banner motd #
+*******************************************************************************
+                                   GREETINGS!!
+                           DO NOT LOG INTO THIS SWITCH
+                        UNLESS YOU HAVE BEEN AUTHORIZED!!!
+*******************************************************************************
+         UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+            THIS IS A PRIVATE SWITCH
+UNAUTHORIZED USE OF THIS SYSTEM CAN RESULT IN CIVIL
+          AND CRIMINAL PENALTIES!!!!!!!!!
+*******************************************************************************#
+user admin group administrators password ciphertext AQBapRgKKSpKTuAV6dTS6Ynh9KyreejJWRDWQkryTbzEoAdfYgAAADlh5UtcP8vs8cY5dnrvGWC4kNYfuClZJHsIZQ0dwYwXezm9B3aeMgwdLOyjEk7wyOXqYetz1/+MkYBS7MG7nbJ4d0NwuTpBS/DsTBbwZQI38RIrs5PU8Gir/IhbxyebbZvw
+user operator group operators password ciphertext AQBapSt5Evs9euM2JpxJErcF1xx35048RfHqdwsvAirDjVbIYgAAAFty1niaemLYAW39IHUF2w7ZZ/2sE4oxBfoQmQuBVL29cPFOxFGipzqiJjv0RKpHK+XniladZS1oOiQKkIpiL6CQ6VYP0vt5ryDsl0/jXPVzxUWi//+iPOMGpaOloNxBKavL
+router vrrp enable
+vrf dmz
+ntp server pool.ntp.org iburst
+ntp enable
+ntp vrf mgmt
+cli-session
+    timeout 5
+!
+!
+!
+aaa authentication allow-fail-through
+!
+!
+aaa authentication login console group local
+aaa authentication login https-server group local
+aaa authentication login ssh group local
+!
+logging 192.168.1.1
+ssh server vrf default
+ssh server vrf mgmt
+vsf split-detect mgmt
+vsf secondary-member 2
+vsf member 1 
+    type jl660a
+    link 1 1/1/25
+    link 2 1/1/26
+vsf member 2 
+    type jl660a
+    link 1 2/1/25
+    link 2 2/1/26
+dhcpv4-snooping
+no dhcpv4-snooping option 82
+dhcpv4-snooping allow-overwrite-binding
+vlan 1
+vlan 100
+    name SALES
+vlan 200
+    name ENGINEERING
+vlan 300
+    name ADMIN
+vlan 400
+    name RESTRICTED
+no spanning-tree
+interface mgmt
+    no shutdown
+    ip dhcp
+interface 1/1/1
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 1/1/2
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 1/1/3
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 1/1/4
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 1/1/5
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 1/1/6
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 1/1/7
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 1/1/8
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 1/1/9
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 1/1/10
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 1/1/11
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 1/1/12
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 1/1/13
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 1/1/14
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 1/1/15
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 1/1/16
+    description ADMIN
+    no shutdown
+    no routing
+    vlan access 300
+    spanning-tree bpdu-guard
+interface 1/1/17
+    description ADMIN
+    no shutdown
+    no routing
+    vlan access 300
+    spanning-tree bpdu-guard
+interface 1/1/18
+    description ADMIN
+    no shutdown
+    no routing
+    vlan access 300
+    spanning-tree bpdu-guard
+interface 1/1/19
+    description ADMIN
+    no shutdown
+    no routing
+    vlan access 300
+    spanning-tree bpdu-guard
+interface 1/1/20
+    description ADMIN
+    no shutdown
+    no routing
+    vlan access 300
+    spanning-tree bpdu-guard
+interface 1/1/21
+    description RESTRICTED
+    no shutdown
+    no routing
+    vlan access 400
+    spanning-tree bpdu-guard
+interface 1/1/22
+    description RESTRICTED
+    no shutdown
+    no routing
+    vlan access 400
+    spanning-tree bpdu-guard
+interface 1/1/23
+    description RESTRICTED
+    no shutdown
+    no routing
+    vlan access 400
+    spanning-tree bpdu-guard
+interface 1/1/24
+    description RESTRICTED
+    no shutdown
+    no routing
+    vlan access 400
+    spanning-tree bpdu-guard
+interface 1/1/25
+    description VSF
+    no shutdown
+interface 1/1/26
+    description VSF
+    no shutdown
+interface 1/1/27
+    no shutdown
+    no routing
+    vlan access 1
+interface 1/1/28
+    no shutdown
+    no routing
+    vlan access 1
+interface 2/1/1
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 2/1/2
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 2/1/3
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 2/1/4
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 2/1/5
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 2/1/6
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 2/1/7
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 2/1/8
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 2/1/9
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 2/1/10
+    description SALES
+    no shutdown
+    no routing
+    vlan access 100
+    spanning-tree bpdu-guard
+interface 2/1/11
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 2/1/12
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 2/1/13
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 2/1/14
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 2/1/15
+    description ENGINEERING
+    no shutdown
+    no routing
+    vlan access 200
+    spanning-tree bpdu-guard
+interface 2/1/16
+    description ADMIN
+    no shutdown
+    no routing
+    vlan access 300
+    spanning-tree bpdu-guard
+interface 2/1/17
+    description ADMIN
+    no shutdown
+    no routing
+    vlan access 300
+    spanning-tree bpdu-guard
+interface 2/1/18
+    description ADMIN
+    no shutdown
+    no routing
+    vlan access 300
+    spanning-tree bpdu-guard
+interface 2/1/19
+    description ADMIN
+    no shutdown
+    no routing
+    vlan access 300
+    spanning-tree bpdu-guard
+interface 2/1/20
+    description ADMIN
+    no shutdown
+    no routing
+    vlan access 300
+    spanning-tree bpdu-guard
+interface 2/1/21
+    description RESTRICTED
+    no shutdown
+    no routing
+    vlan access 400
+    spanning-tree bpdu-guard
+interface 2/1/22
+    description RESTRICTED
+    no shutdown
+    no routing
+    vlan access 400
+    spanning-tree bpdu-guard
+interface 2/1/23
+    description RESTRICTED
+    no shutdown
+    no routing
+    vlan access 400
+    spanning-tree bpdu-guard
+interface 2/1/24
+    description RESTRICTED
+    no shutdown
+    no routing
+    vlan access 400
+    spanning-tree bpdu-guard
+interface 2/1/25
+    no shutdown
+interface 2/1/26
+    no shutdown
+interface 2/1/27
+    no shutdown
+    no routing
+    vlan access 1
+interface 2/1/28
+    no shutdown
+    no routing
+    vlan access 1
+interface vlan 1
+mirror session 1
+    destination interface 1/1/15
+    source vlan 100 both
+    source vlan 200 both
+    enable
+mirror session 2
+mirror session 3
+mirror session 4
+ip dns server-address 8.8.8.8 vrf mgmt
+ip dns server-address 1.1.1.1 vrf mgmt
+!
+!
+!
+!
+!
+router graceful-restart disable
+https-server vrf default
+https-server vrf mgmt
+configuration-lockout central managed

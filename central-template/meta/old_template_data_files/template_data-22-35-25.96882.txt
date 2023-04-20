@@ -1,0 +1,12 @@
+# template data
+template_list:
+    6300_cx_us_access:
+        current_version: 2
+        folder: cx_switches
+        hash: fbf01a24c40c3813be605b61368731d3
+        name: 6300_cx_us_access
+    iap-office:
+        current_version: '1'
+        folder: iap
+        hash: b2b9dcdee7829f887b2746ca8360a193
+        name: iap-office

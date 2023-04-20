@@ -1,0 +1,8 @@
+all:
+  hosts:
+    central:
+      ansible_host: internal-apigw.central.arubanetworks.com
+      ansible_connection: httpapi
+      ansible_network_os: aruba_central
+      ansible_httpapi_use_ssl: True
+      #ansible_httpapi_central_access_token: "{{api_token}}"

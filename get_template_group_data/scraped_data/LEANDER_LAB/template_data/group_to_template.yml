@@ -1,0 +1,72 @@
+default: none
+LL-B-ACCESS-main-v1:
+- device_type: CX
+  group: LL-B-ACCESS-main-v1
+  model: '6300'
+  name: 6300_cx_us_access.txt
+  template_hash: bbf0eb2d9eb468cb95757f32b1642516
+  version: ALL
+LL-B-ACCESS-main-v2:
+- device_type: CX
+  group: LL-B-ACCESS-main-v2
+  model: '6300'
+  name: 6300_cx_us_access.txt
+  template_hash: fbf01a24c40c3813be605b61368731d3
+  version: ALL
+LL-B-ACCESS-main-v3:
+- device_type: CX
+  group: LL-B-ACCESS-main-v3
+  model: '6300'
+  name: 6300_cx_us_access.txt
+  template_hash: ac3591dd616f558c12e5c166faadc474
+  version: ALL
+LL-B-ACCESS-main-v4:
+- device_type: CX
+  group: LL-B-ACCESS-main-v4
+  model: '6300'
+  name: 6300_cx_us_access.txt
+  template_hash: 67159e38927024609b66cb4787c33b64
+  version: ALL
+LL-B-ACCESS-main-v5:
+- device_type: CX
+  group: LL-B-ACCESS-main-v5
+  model: '6300'
+  name: 6300_cx_us_access.txt
+  template_hash: 80ee6f986b28729d51289c00d35617a0
+  version: ALL
+LL-C-ACCESS-main-v1:
+- device_type: CX
+  group: LL-C-ACCESS-main-v1
+  model: '6300'
+  name: 6300_cx_us_access.txt
+  template_hash: bbf0eb2d9eb468cb95757f32b1642516
+  version: ALL
+LL-C-ACCESS-main-v2:
+- device_type: CX
+  group: LL-C-ACCESS-main-v2
+  model: '6300'
+  name: 6300_cx_us_access.txt
+  template_hash: fbf01a24c40c3813be605b61368731d3
+  version: ALL
+LL-C-ACCESS-main-v3:
+- device_type: CX
+  group: LL-C-ACCESS-main-v3
+  model: '6300'
+  name: 6300_cx_us_access.txt
+  template_hash: ac3591dd616f558c12e5c166faadc474
+  version: ALL
+LL-C-ACCESS-main-v4:
+- device_type: CX
+  group: LL-C-ACCESS-main-v4
+  model: '6300'
+  name: 6300_cx_us_access.txt
+  template_hash: 67159e38927024609b66cb4787c33b64
+  version: ALL
+LL-C-ACCESS-main-v5:
+- device_type: CX
+  group: LL-C-ACCESS-main-v5
+  model: '6300'
+  name: 6300_cx_us_access.txt
+  template_hash: 80ee6f986b28729d51289c00d35617a0
+  version: ALL
+unprovisioned: none

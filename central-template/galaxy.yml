@@ -1,0 +1,5 @@
+---
+collections:
+  # Install ansible.netcommon from Ansible Galaxy.
+  - ansible.netcommon
+  - arubanetworks.aruba_central

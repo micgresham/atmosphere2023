@@ -1,0 +1,14 @@
+# the name should be the name of the template
+6300cx_us_access:
+# version should match what should be updated
+  version: '1'
+# customer is used for naming the groups
+  customer: 'LL'
+# template type is also used for group naming it should match the standard (ie. ACCESS etc...)
+  type: 'ACCESS'
+# branch is used for naming - it should match the branch of the repo
+  branch: 'main'
+# groups numbers is the name of the groups you want to create in list form group name will be Customer + Type + Group Name + Branch and version
+  group_numbers:
+   - 'A'
+   - 'B'

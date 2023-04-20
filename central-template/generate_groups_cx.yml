@@ -1,0 +1,59 @@
+---
+- name: Get API token from user
+  hosts: central
+  gather_facts: no
+  vars_prompt:
+    name: api_token
+    prompt: Please provide your Token
+    private: yes
+  tasks:
+    - name: set API token 
+      set_fact:
+        api_token: "{{api_token}}"
+        ansible_httpapi_central_access_token: "{{api_token}}"
+
+- name: Generate New Versions
+  vars:
+    template_type: 'cx_switches'
+    customer: 'LL'
+    api_token: "{{hostvars['central']['api_token']}}"
+    base_url: "https://{{hostvars['central']['ansible_host']}}"
+  gather_facts: no
+  hosts: central
+  roles:
+    - role: make_groups
+
+- name: Add template text 
+  hosts: central
+  gather_facts: no
+  roles:
+     - role: arubanetworks.aruba_central_role
+  tasks:
+    - name: Upload template files to new groups ALL version
+      central_templates:
+        action: create
+        group_name: "{{item.value.first_group}}"
+        template_name: "{{item.value.template_file_name}}.txt"
+        device_type: CX
+        version: ALL
+        model: "{{item.value.template_file_name.split('_')[0]}}"
+        local_file_path: "{{item.value.file_location}}"
+      loop: "{{hostvars['central']['new_groups_to_make']['groups_requested']|dict2items}}"
+
+- name: Clone!
+  vars:
+    template_type: 'cx_switches'
+    customer: 'LL'
+    api_token: "{{hostvars['central']['api_token']}}"
+    base_url: "https://{{hostvars['central']['ansible_host']}}"
+  gather_facts: no
+  hosts: central
+  roles:
+    - role: clone_groups
+
+- name: Print Summary!
+  gather_facts: no
+  hosts: central
+  tasks:
+    - debug:
+        msg: "Groups Have Been Created: {{hostvars['central']['new_groups_to_make']['groups_requested']}}"

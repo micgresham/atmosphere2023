@@ -1,0 +1,75 @@
+---
+- name: set variables
+  set_fact:
+    version: "{{group_requested.value.version|int}}"
+    customer: "{{group_requested.value.customer}}"
+    type: "{{group_requested.value.type}}"
+    branch: "{{group_requested.value.branch}}"
+    group_names: "{{group_requested.value.group_names}}"
+    template_name: "{{group_requested.value.type}}-{{group_requested.value.branch}}-v{{group_requested.value.version}}"
+    template_file_name: "{{group_requested.key}}"
+    group_list: []
+    group_requested_data: {}
+
+- name: set variables
+  vars:
+    combined_name: "{{group_requested.key}}_{{branch|upper}}_BRANCH_v{{version}}"
+  set_fact:
+    current_template_version: "{{definitions['template_list'][template_file_name]['current_version']|int}}"
+    expected_hash: "{{hash_history[group_requested.key][combined_name]}}"
+
+- name: Set template location if current version
+  set_fact:
+    file_location: "{{ playbook_dir }}/{{ template_type }}/{{ template_file_name }}.txt"
+  when: current_template_version == version
+
+- name: Set template location if not current version
+  set_fact:
+    file_location: "{{ playbook_dir }}/{{ template_type }}/archive/{{ template_file_name }}/{{ template_file_name }}-v-{{version}}.txt"
+  when: current_template_version != version
+
+- name: Get file status
+  stat: 
+    path: "{{file_location}}"
+  register: file_status
+
+- name: Quit if template file doesn't exist 
+  assert:
+    that:
+       - file_status.stat.exists == True 
+    msg: "Template File Doesn't Exist"
+
+- name: Generate Group List
+  vars:
+    new_group: "{{customer}}-{{item}}-{{template_name}}"
+  set_fact:
+    group_list: "{{group_list + [new_group]}}"
+  loop: "{{group_names}}"
+
+- name: debug group_list 
+  debug:
+    var: group_list
+
+- name: set additional values 
+  set_fact:
+    first_group: "{{group_list[0]}}"
+    clone_list: "{{group_list[1:]}}"
+
+- name: See if the group already exists and stop if it does
+  uri:
+    url: "{{base_url}}/configuration/v1/groups/properties?groups={{item}}"
+    method: GET
+    headers:
+       Authorization: "bearer {{api_token}}"
+       Content_Type: application/json
+    status_code: 400
+  register: sites_results
+  loop: "{{group_list}}"
+
+- name: Set dictionary
+  set_fact:
+    new_groups_to_make: "{{ new_groups_to_make|combine({'groups_requested': 
+                           {template_file_name: {'template_file_name': template_file_name, 'group_list': group_list,
+                          'file_location': file_location,
+                          'first_group': first_group, 'clone_list': clone_list,
+                          'expected_hash': expected_hash }}}, recursive=True) }}"

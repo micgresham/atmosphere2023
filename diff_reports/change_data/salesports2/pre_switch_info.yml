@@ -1,0 +1,25 @@
+Leander-Lab:
+  6300-SWITCH-A:
+    group: LL-B-ACCESS-main-v4
+    commander_mac: 88:3a:30:b4:40:40
+    firmware:
+    - 10.10.1020
+    serial: SG9BKMZ074
+    ip_address: 192.168.8.125
+    status: Up
+    variables:
+      SG9BKMZ074:
+        _sys_hostname: 6300-SWITCH-A
+        _sys_lan_mac: 88:3a:30:b4:40:40
+        _sys_serial: SG9BKMZ074
+        adminpw: aruba123
+        dns_server_primary: 8.8.8.8
+        dns_server_secondary: 1.1.1.1
+        hostname: 6300-SWITCH-A
+        is_staging: Y
+        sales_hardcode_speed: Y
+        ntp_server_1: pool.ntp.org
+        operpw: aruba123
+        syslog_server_1: 192.168.1.1
+        timezone: utc
+    retrieved: true

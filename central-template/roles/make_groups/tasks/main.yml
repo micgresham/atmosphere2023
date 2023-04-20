@@ -1,0 +1,101 @@
+---
+- name: Initialize Variables
+  set_fact:
+    group_exists: []
+    new_groups_to_make: {}
+
+- name: Print Template Type Being Generated
+  debug:
+    var: template_type
+
+- name: Pull in current template definitions
+  include_vars:
+    name: definitions
+    file: "{{ playbook_dir }}/template_data.yml"
+
+- name: Pull in hash history - CX
+  include_vars:
+    name: hash_history
+    file: "{{ playbook_dir }}/hash_history_cx_switches.yml"
+  when: template_type == 'cx_switches'
+
+- name: Pull in hash history - IAP
+  include_vars:
+    name: hash_history
+    file: "{{ playbook_dir }}/hash_history_iap.yml"
+  when: template_type == 'iap'
+
+- name: Make sure token works - stop if it isn't valid
+  uri:
+    url: "{{base_url}}/central/v2/sites"
+    method: GET
+    headers:
+       Authorization: "bearer {{api_token}}"
+       Content_Type: application/json
+    status_code: 200
+  register: sites_results
+
+- name: Get info about new group(s) being built
+  include_vars:
+    file: inputs/groups.yml
+    name: groups_provided
+
+- name: Build List of Groups to Create - CX
+  include_tasks: make_group_list.yml
+  loop: "{{groups_provided|dict2items}}"
+  loop_control:
+    loop_var: group_requested
+
+- name: print new_groups_to_make
+  debug:
+    var: new_groups_to_make
+
+- name: Create first group for each requested grouping - CX
+  vars:
+     name_of_group: "{{item.value.first_group}}"
+  uri:
+    url: "{{base_url}}/configuration/v2/groups"
+    method: POST
+    status_code: 201
+    headers:
+       Authorization: "bearer {{api_token}}"
+       Content_Type: application/json
+    body_format: json
+    body: "{ \"group\": \"{{name_of_group}}\",\"group_attributes\": {\"template_info\": {
+                  \"Wired\": true},
+                \"group_properties\": {
+                  \"AllowedDevTypes\": [
+                    \"Switches\"
+                  ],
+                  \"AllowedSwitchTypes\": [
+                    \"AOS_CX\",
+                    \"AOS_S\"
+                  ]
+                }
+              }} "
+  loop: "{{new_groups_to_make['groups_requested']|dict2items}}"
+  when: template_type == 'cx_switches'
+
+- name: Create first group for each requested grouping - IAP
+  vars:
+     name_of_group: "{{item.value.first_group}}"
+  uri:
+    url: "{{base_url}}/configuration/v2/groups"
+    method: POST
+    status_code: 201
+    headers:
+       Authorization: "bearer {{api_token}}"
+       Content_Type: application/json
+    body_format: json
+    body: "{ \"group\": \"{{name_of_group}}\",\"group_attributes\": {\"template_info\": {
+                  \"Wireless\": true},
+                \"group_properties\": {
+                  \"AllowedDevTypes\": [
+                    \"AccessPoints\"
+                  ],
+                  \"ApNetworkRole\": \"Standard\",
+                  \"Architecture\": \"Instant\",
+                }
+              }} "
+  loop: "{{new_groups_to_make['groups_requested']|dict2items}}"
+  when: template_type == 'iap'

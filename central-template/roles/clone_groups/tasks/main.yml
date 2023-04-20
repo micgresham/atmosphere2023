@@ -1,0 +1,12 @@
+---
+- name: Make sure template hashes are correct before Cloning - CX
+  include_tasks: verify.yml
+  loop: "{{hostvars['central']['new_groups_to_make']['groups_requested']|dict2items}}"
+  loop_control:
+    loop_var: group_to_check
+  
+- name: Include Cloning Task
+  include_tasks: clone.yml
+  loop: "{{hostvars['central']['new_groups_to_make']['groups_requested']|dict2items}}"
+  loop_control:
+    loop_var: group_to_check

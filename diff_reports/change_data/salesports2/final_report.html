@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=utf-8" />
+    <title>Diff Report</title>
+<style>
+#report_table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#report_table td, #report_table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#report_table tr:nth-child(even){background-color: #f2f2f2;}
+
+#report_table tr:hover {background-color: #ddd;}
+
+#report_table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  background-color: #04AA6D;
+  color: white;
+}
+</style>
+</head>
+
+<body>
+<center>
+<h1>Change Diff Report</h1>
+<li><a href="#diff_link">DEVICES WITH DIFFERENCES - 1</a></li>
+<li><a href="#nodiff_link">DEVICES WITH NO DIFFERENCES - 0 </a></li>
+<li><a href="#error_link">DEVICES WITH COMPARE ERRORS - 0</a></li>
+<br>
+<br>
+<a id="diff_link"><h2>DEVICES WITH DIFFERENCES (1)</h2></a></center>
+<table id="report_table">
+  <tr>
+    <th>Device Name</th>  
+    <th>Commander Serial Number</th>
+    <th>Group</th>
+    <th>Firmware</th>  
+    <th>Variable Differences</th> 
+    <th>Link to Diff Report</th>
+  </tr>
+<tr>
+    <td>6300-SWITCH-A</td>  
+    <td>SG9BKMZ074</td>
+    <td>Pre: LL-B-ACCESS-main-v4<br>Post: LL-B-ACCESS-main-v5</td>
+    <td>Pre: ['10.10.1020']<br>Post: ['10.10.1020']</td>
+    <td><b>VARIABLES CHANGED:</b><br>[]<br><br><b>VARIABLES DELETED:</b><br>[]<br><br><b>VARIABLES ADDED:</b><br>[]</td>
+    <td><a href ="6300-SWITCH-A_diff.html">Diff Report</a></td>
+  </tr>
+</table>
+<br>
+<br>
+<center>
+<a id="nodiff_link"><h2>DEVICES WITH NO DIFFERENCES (0)</h2></a>
+</center>
+<table id="report_table" class="js-sort-table">
+  <tr>
+    <th>Device Name</th>  
+    <th>Commander Serial Number</th>
+    <th>Group</th>
+    <th>Firmware</th>
+    <th>Variable Differences</th>    
+  </tr>
+</table>
+<br>
+<br>
+<center>
+<a id="error_link"><h2>DEVICES WITH AN ERROR IN COMPARISON (0)</h2></a>
+</center>
+<table id="report_table" class="js-sort-table">
+  <tr>
+    <th>Device Name</th>
+    <th>Variable Differences</th> 
+  </tr>
+</table>
+<br>
+<br>
+<br>
+<br>
+</body>
+
+</html>

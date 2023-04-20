@@ -1,0 +1,177 @@
+! TEMPLATE NAME: iap-office -- VERSION: 1 -- MAIN_BRANCH
+
+version 8.7.1.0-8.7.1
+virtual-controller-country US
+virtual-controller-key 1310513901a1ed7faba3063c2d61078d1e1b4e6badf7ec1d3a
+name Testing_test_test2
+terminal-access
+clock timezone none 00 00
+rf-band all
+
+allowed-ap 20:a6:cd:cf:25:8a
+
+arm
+ wide-bands 5ghz
+ min-tx-power 18
+ max-tx-power 127
+ band-steering-mode prefer-5ghz
+ air-time-fairness-mode default-access
+
+rf dot11g-radio-profile
+ max-tx-power 3
+
+rf dot11a-radio-profile
+ max-tx-power 9
+ min-tx-power 3
+
+rf dot11a-secondary-radio-profile
+ max-tx-power 9
+ min-tx-power 3
+
+syslog-level warn ap-debug 
+syslog-level warn network 
+syslog-level warn security 
+syslog-level warn system 
+syslog-level warn user 
+syslog-level warn user-debug 
+syslog-level warn wireless 
+
+hash-mgmt-password
+hash-mgmt-user admin password cleartext dogdogcatcat
+
+wlan access-rule default_wired_port_profile
+ index 0
+ rule any any match any any any permit
+
+wlan access-rule wired-SetMeUp
+ index 1
+ rule masterip 0.0.0.0 match tcp 80 80 permit
+ rule masterip 0.0.0.0 match tcp 4343 4343 permit
+ rule any any match udp 67 68 permit
+ rule any any match udp 53 53 permit
+
+wlan access-rule OTOTest
+ utf8
+ index 2
+ rule any any match any any any permit
+
+wlan access-rule logon
+ index 3
+ captive-portal external
+ rule any any match udp 500 500 permit
+ rule any any match esp any any permit
+ rule any any match tcp 1723 1723 permit
+ rule any any match udp 1701 1701 permit
+ rule any any match any any any deny
+
+wlan ssid-profile OTOTest
+ enable
+ index 0
+ type employee
+ essid OTOTest
+ vlan 19
+ utf8
+ opmode opensystem
+ max-authentication-failures 0
+ rf-band all
+ captive-portal disable
+ mac-authentication
+ dtim-period 1
+ broadcast-filter arp
+ radius-accounting
+ radius-interim-accounting-interval 1
+ blacklist
+ dmo-channel-utilization-threshold 90
+ local-probe-req-thresh 0
+ max-clients-threshold 64
+
+auth-survivability cache-time-out 24
+
+wlan captive-portal
+ background-color 16777215
+ banner-color 15329769
+ decoded-texts banner/terms/policy
+ banner-text "Welcome to Guest Network"
+ terms-of-use "This network is not secure and use it at your own risk."
+ use-policy "Please read and accept terms and conditions and then login."
+
+wlan external-captive-portal
+ server localhost
+ port 80
+ url "/"
+ auth-text "Authenticated"
+ auto-whitelist-disable
+ https
+
+blacklist-time 3600
+auth-failure-blacklist-time 3600
+
+ids
+ wireless-containment none
+
+wired-port-profile wired-SetMeUp
+ switchport-mode access
+ allowed-vlan all
+ native-vlan guest
+ no shutdown
+ access-rule-name wired-SetMeUp
+ speed auto
+ duplex auto
+ no poe
+ type guest
+ captive-portal disable
+ no dot1x
+
+wired-port-profile default_wired_port_profile
+ switchport-mode trunk
+ allowed-vlan all
+ native-vlan 1
+ no shutdown
+ access-rule-name default_wired_port_profile
+ speed auto
+ duplex full
+ no poe
+ type employee
+ captive-portal disable
+ no dot1x
+
+enet0-port-profile default_wired_port_profile
+ip dhcp VLAN19
+ server-type local
+ server-vlan 19
+ subnet 192.168.8.0
+ subnet-mask 255.255.248.0
+ lease-time 3600
+ dns-server 8.8.8.8
+
+uplink
+ preemption
+ enforce none
+ failover-internet-pkt-lost-cnt 10
+ failover-internet-pkt-send-freq 30
+ failover-vpn-timeout 180
+
+airgroup
+ disable
+
+airgroupservice airplay
+ disable
+ description AirPlay
+
+airgroupservice airprint
+ disable
+ description AirPrint
+
+clarity
+ inline-sta-stats
+ inline-auth-stats
+ inline-dhcp-stats
+ inline-dns-stats
+
+cluster-security
+ allow-low-assurance-devices
+ 
+per-ap-settings %_sys_lan_mac%
+    hostname %h_name%
+
+! TEMPLATE NAME: iap-office -- VERSION: 1 -- MAIN_BRANCH

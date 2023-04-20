@@ -1,0 +1,5 @@
+6300-SWITCH-A:
+    name: 6300-SWITCH-A
+    ip: 192.168.8.125
+    group: ACCESS
+    site: Leander-Lab
